@@ -359,6 +359,9 @@ function calculateScore() {
 
   // Função para criar o gráfico de barras
   generateChart(scores);
+
+    // Scroll automático para a div do gráfico
+  document.getElementById('chart-container').scrollIntoView({ behavior: 'smooth' });
 }
 
 function generateChart(scores) {
