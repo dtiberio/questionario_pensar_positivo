@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Questionário de Atitudes</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .question { margin-bottom: 10px; }
+    .result { margin-top: 20px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h2>Questionário de Atitudes</h2>
+  <form id="questionnaire">
+    <!-- Questões do grupo I: Aprovação (1-5) -->
+    <div class="question">
+      <label>1. Receber críticas me faz sentir mal:</label><br>
+      <input type="radio" name="q1" value="-2"> Totalmente de acordo<br>
+      <input type="radio" name="q1" value="-1"> Moderadamente de acordo<br>
+      <input type="radio" name="q1" value="0"> Dúvidas<br>
+      <input type="radio" name="q1" value="1"> Moderadamente em desacordo<br>
+      <input type="radio" name="q1" value="2"> Totalmente em desacordo<br>
+    </div>
+    <div class="question">
+      <label>2. É melhor renunciar aos meus interesses para agradar aos outros:</label><br>
+      <input type="radio" name="q2" value="-2"> Totalmente de acordo<br>
+      <input type="radio" name="q2" value="-1"> Moderadamente de acordo<br>
+      <input type="radio" name="q2" value="0"> Dúvidas<br>
+      <input type="radio" name="q2" value="1"> Moderadamente em desacordo<br>
+      <input type="radio" name="q2" value="2"> Totalmente em desacordo<br>
+    </div>
+    <div class="question">
+      <label>3. Para ser feliz preciso que as outras pessoas me aprovem:</label><br>
+      <input type="radio" name="q3" value="-2"> Totalmente de acordo<br>
+      <input type="radio" name="q3" value="-1"> Moderadamente de acordo<br>
+      <input type="radio" name="q3" value="0"> Dúvidas<br>
+      <input type="radio" name="q3" value="1"> Moderadamente em desacordo<br>
+      <input type="radio" name="q3" value="2"> Totalmente em desacordo<br>
+    </div>
+    <div class="question">
+      <label>4. Se alguém importante espera que eu faça algo, devo fazê-lo:</label><br>
+      <input type="radio" name="q4" value="-2"> Totalmente de acordo<br>
+      <input type="radio" name="q4" value="-1"> Moderadamente de acordo<br>
+      <input type="radio" name="q4" value="0"> Dúvidas<br>
+      <input type="radio" name="q4" value="1"> Moderadamente em desacordo<br>
+      <input type="radio" name="q4" value="2"> Totalmente em desacordo<br>
+    </div>
+    <div class="question">
+      <label>5. Meu valor depende do que os outros pensam de mim:</label><br>
+      <input type="radio" name="q5" value="-2"> Totalmente de acordo<br>
+      <input type="radio" name="q5" value="-1"> Moderadamente de acordo<br>
+      <input type="radio" name="q5" value="0"> Dúvidas<br>
+      <input type="radio" name="q5" value="1"> Moderadamente em desacordo<br>
+      <input type="radio" name="q5" value="2"> Totalmente em desacordo<br>
+    </div>
+
+    <!-- Continuação para as perguntas do grupo II a VII -->
+    <!-- Repetir estrutura acima, ajustando o nome dos campos para q6 a q35 e os textos correspondentes -->
+
+    <!-- Botão de Submissão -->
+    <button type="button" onclick="calculateScore()">Calcular Pontuação</button>
+  </form>
+  
+  <!-- Div para Mostrar Resultado -->
+  <div id="result" class="result"></div>
+
+  <script>
+    function calculateScore() {
+      const form = document.getElementById('questionnaire');
+      const totalQuestions = 35;
+      const scores = { approval: 0, love: 0, achievement: 0, perfectionism: 0, rights: 0, omnipotence: 0, autonomy: 0 };
+
+      // Percorre cada pergunta, acumulando pontuações nos grupos
+      for (let i = 1; i <= totalQuestions; i++) {
+        const answer = form[`q${i}`].value;
+        if (answer) {
+          const value = parseInt(answer, 10);
+          if (i <= 5) scores.approval += value;
+          else if (i <= 10) scores.love += value;
+          else if (i <= 15) scores.achievement += value;
+          else if (i <= 20) scores.perfectionism += value;
+          else if (i <= 25) scores.rights += value;
+          else if (i <= 30) scores.omnipotence += value;
+          else scores.autonomy += value;
+        } else {
+          alert(`Por favor, responda à pergunta ${i}`);
+          return;
+        }
+      }
+
+      // Interpretação dos resultados
+      const interpretations = {
+        approval: interpretScore(scores.approval, "Aprovação"),
+        love: interpretScore(scores.love, "Amor"),
+        achievement: interpretScore(scores.achievement, "Realização"),
+        perfectionism: interpretScore(scores.perfectionism, "Perfeccionismo"),
+        rights: interpretScore(scores.rights, "Direitos sobre Outros"),
+        omnipotence: interpretScore(scores.omnipotence, "Onipotência"),
+        autonomy: interpretScore(scores.autonomy, "Autonomia"),
+      };
+
+      // Exibir Resultado Final
+      document.getElementById('result').innerHTML = `
+        <p>Pontuação de Aprovação: ${scores.approval} - ${interpretations.approval}</p>
+        <p>Pontuação de Amor: ${scores.love} - ${interpretations.love}</p>
+        <p>Pontuação de Realização: ${scores.achievement} - ${interpretations.achievement}</p>
+        <p>Pontuação de Perfeccionismo: ${scores.perfectionism} - ${interpretations.perfectionism}</p>
+        <p>Pontuação de Direitos: ${scores.rights} - ${interpretations.rights}</p>
+        <p>Pontuação de Onipotência: ${scores.omnipotence} - ${interpretations.omnipotence}</p>
+        <p>Pontuação de Autonomia: ${scores.autonomy} - ${interpretations.autonomy}</p>
+      `;
+    }
+
+    function interpretScore(score, category) {
+      if (score >= 0 && score <= 10) {
+        return `Você é psicologicamente forte na área de ${category}, com boa adaptação e independência.`;
+      } else if (score < 0 && score >= -10) {
+        return `Você demonstra alguma vulnerabilidade emocional na área de ${category}, o que pode indicar dependência emocional ou desafios de adaptação.`;
+      } else {
+        return `Pontuação fora do esperado.`;
+      }
+    }
+  </script>
+</body>
+</html>
