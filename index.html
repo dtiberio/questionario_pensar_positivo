@@ -9,6 +9,7 @@
     .question { margin-bottom: 10px; }
     .result { margin-top: 20px; font-weight: bold; }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <h2>Questionário de Atitudes</h2>
@@ -316,62 +317,100 @@
   <!-- Div para Mostrar Resultado -->
   <div id="result" class="result"></div>
 
-  <script>
-    function calculateScore() {
-      const form = document.getElementById('questionnaire');
-      const totalQuestions = 35;
-      const scores = { approval: 0, love: 0, achievement: 0, perfectionism: 0, rights: 0, omnipotence: 0, autonomy: 0 };
+  <!-- Div para exibir o gráfico -->
+<div id="chart-container" style="width: 80%; margin: auto; max-width: 600px; display: none;">
+  <canvas id="scoreChart"></canvas>
+</div>
 
-      // Percorre cada pergunta, acumulando pontuações nos grupos
-      for (let i = 1; i <= totalQuestions; i++) {
-        const answer = form[`q${i}`].value;
-        if (answer) {
-          const value = parseInt(answer, 10);
-          if (i <= 5) scores.approval += value;
-          else if (i <= 10) scores.love += value;
-          else if (i <= 15) scores.achievement += value;
-          else if (i <= 20) scores.perfectionism += value;
-          else if (i <= 25) scores.rights += value;
-          else if (i <= 30) scores.omnipotence += value;
-          else scores.autonomy += value;
-        } else {
-          alert(`Por favor, responda à pergunta ${i}`);
-          return;
+ <script>
+function calculateScore() {
+  const form = document.getElementById('questionnaire');
+  const totalQuestions = 35;
+  const scores = { approval: 0, love: 0, achievement: 0, perfectionism: 0, rights: 0, omnipotence: 0, autonomy: 0 };
+
+  // Percorre cada pergunta, acumulando pontuações nos grupos
+  for (let i = 1; i <= totalQuestions; i++) {
+    const answer = form[`q${i}`].value;
+    if (answer) {
+      const value = parseInt(answer, 10);
+      if (i <= 5) scores.approval += value;
+      else if (i <= 10) scores.love += value;
+      else if (i <= 15) scores.achievement += value;
+      else if (i <= 20) scores.perfectionism += value;
+      else if (i <= 25) scores.rights += value;
+      else if (i <= 30) scores.omnipotence += value;
+      else scores.autonomy += value;
+    } else {
+      alert(`Por favor, responda à pergunta ${i}`);
+      return;
+    }
+  }
+
+  // Exibir os resultados de pontuação no texto
+  document.getElementById('result').innerHTML = `
+    <p>Pontuação de Aprovação: ${scores.approval}</p>
+    <p>Pontuação de Amor: ${scores.love}</p>
+    <p>Pontuação de Realização: ${scores.achievement}</p>
+    <p>Pontuação de Perfeccionismo: ${scores.perfectionism}</p>
+    <p>Pontuação de Direitos: ${scores.rights}</p>
+    <p>Pontuação de Onipotência: ${scores.omnipotence}</p>
+    <p>Pontuação de Autonomia: ${scores.autonomy}</p>
+  `;
+
+  // Função para criar o gráfico de barras
+  generateChart(scores);
+}
+
+function generateChart(scores) {
+  // Exibir a div do gráfico
+  document.getElementById('chart-container').style.display = 'block';
+
+  // Dados e configurações do gráfico
+  const ctx = document.getElementById('scoreChart').getContext('2d');
+  const data = {
+    labels: ['Aprovação', 'Amor', 'Realização', 'Perfeccionismo', 'Direitos sobre Outros', 'Onipotência', 'Autonomia'],
+    datasets: [{
+      label: 'Pontuação por Grupo',
+      data: [
+        scores.approval,
+        scores.love,
+        scores.achievement,
+        scores.perfectionism,
+        scores.rights,
+        scores.omnipotence,
+        scores.autonomy,
+      ],
+      backgroundColor: 'rgba(75, 192, 192, 0.5)',
+      borderColor: 'rgba(75, 192, 192, 1)',
+      borderWidth: 1,
+    }]
+  };
+
+  const config = {
+    type: 'bar',
+    data: data,
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'Pontuação',
+          }
+        },
+        x: {
+          title: {
+            display: true,
+            text: 'Grupo'
+          }
         }
       }
-
-      // Interpretação dos resultados
-      const interpretations = {
-        approval: interpretScore(scores.approval, "Aprovação"),
-        love: interpretScore(scores.love, "Amor"),
-        achievement: interpretScore(scores.achievement, "Realização"),
-        perfectionism: interpretScore(scores.perfectionism, "Perfeccionismo"),
-        rights: interpretScore(scores.rights, "Direitos sobre Outros"),
-        omnipotence: interpretScore(scores.omnipotence, "Onipotência"),
-        autonomy: interpretScore(scores.autonomy, "Autonomia"),
-      };
-
-      // Exibir Resultado Final
-      document.getElementById('result').innerHTML = `
-        <p>Pontuação de Aprovação: ${scores.approval} - ${interpretations.approval}</p>
-        <p>Pontuação de Amor: ${scores.love} - ${interpretations.love}</p>
-        <p>Pontuação de Realização: ${scores.achievement} - ${interpretations.achievement}</p>
-        <p>Pontuação de Perfeccionismo: ${scores.perfectionism} - ${interpretations.perfectionism}</p>
-        <p>Pontuação de Direitos: ${scores.rights} - ${interpretations.rights}</p>
-        <p>Pontuação de Onipotência: ${scores.omnipotence} - ${interpretations.omnipotence}</p>
-        <p>Pontuação de Autonomia: ${scores.autonomy} - ${interpretations.autonomy}</p>
-      `;
     }
+  };
 
-    function interpretScore(score, category) {
-      if (score >= 0 && score <= 10) {
-        return `Você é psicologicamente forte na área de ${category}, com boa adaptação e independência.`;
-      } else if (score < 0 && score >= -10) {
-        return `Você demonstra alguma vulnerabilidade emocional na área de ${category}, o que pode indicar dependência emocional ou desafios de adaptação.`;
-      } else {
-        return `Pontuação fora do esperado.`;
-      }
-    }
-  </script>
+  // Renderizar o gráfico
+  new Chart(ctx, config);
+}
+</script>
 </body>
 </html>
