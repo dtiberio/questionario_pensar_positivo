@@ -445,15 +445,34 @@ function generateChart(scores) {
 
 function submitToGoogleSheet(answers) {
   const url = "https://script.google.com/macros/s/AKfycbw1wNEyNULHoFg8hrAbwfDj4_QnkK3q_TunCP5KD5KRKh3wIcHglqiIILQLdnx7sif8LA/exec";
+  console.log("Submitting data to Google Sheets:", answers);
 
+  // Display area for feedback messages
+  const feedbackDiv = document.getElementById('feedback');
+  feedbackDiv.style.display = "block";
+  feedbackDiv.innerHTML = "Submitting data...";
+
+  // Send the answers object as JSON
   fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(answers),
   })
-  .then(response => response.json())
+  .then(response => {
+    // Check if the response is OK (status code 200)
+    if (response.ok) {
+      feedbackDiv.innerHTML = "Data submitted successfully! Status code: " + response.status;
+      return response.json();
+    } else {
+      feedbackDiv.innerHTML = "Submission failed! Status code: " + response.status;
+      throw new Error("Server returned status code: " + response.status);
+    }
+  })
   .then(data => console.log("Data saved successfully:", data))
-  .catch(error => console.error("Error saving data:", error));
+  .catch(error => {
+    feedbackDiv.innerHTML = "An error occurred during submission. " + error.message;
+    console.error("Error saving data:", error);
+  });
 }
 </script>
 </body>
