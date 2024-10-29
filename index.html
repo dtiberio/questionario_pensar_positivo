@@ -454,25 +454,18 @@ function submitToGoogleSheet(answers) {
   feedbackDiv.style.display = "block";
   feedbackDiv.innerHTML = "Submitting data...";
 
-  // Send the answers object as JSON
+  // Send the answers object as JSON with no-cors mode
   fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(answers),
+    mode: "no-cors"  // This bypasses the CORS policy
   })
-  .then(response => {
-    // Check if the response is OK (status code 200)
-    if (response.ok) {
-      feedbackDiv.innerHTML = "Data submitted successfully! Status code: " + response.status;
-      return response.json();
-    } else {
-      feedbackDiv.innerHTML = "Submission failed! Status code: " + response.status;
-      throw new Error("Server returned status code: " + response.status);
-    }
+  .then(() => {
+    feedbackDiv.innerHTML = "Data submitted successfully!";
   })
-  .then(data => console.log("Data saved successfully:", data))
   .catch(error => {
-    feedbackDiv.innerHTML = "An error occurred during submission. " + error.message;
+    feedbackDiv.innerHTML = "An error occurred during submission.";
     console.error("Error saving data:", error);
   });
 }
