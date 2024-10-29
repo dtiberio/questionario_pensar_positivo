@@ -14,6 +14,12 @@
 <body>
   <h2>Questionário de Atitudes</h2>
   <form id="questionnaire">
+    <!-- User Name Field -->
+    <div class="question">
+      <label for="name">Nome:</label>
+      <input type="text" name="name" id="name" placeholder="O Seu Nome">
+    </div>
+    
     <!-- Grupo I: Aprovação (1-5) -->
     <div class="question">
       <label>1. Receber críticas me faz sentir mal:</label><br>
@@ -322,16 +328,26 @@
   <canvas id="scoreChart"></canvas>
 </div>
 
- <script>
+<script>
 function calculateScore() {
   const form = document.getElementById('questionnaire');
   const totalQuestions = 35;
   const scores = { approval: 0, love: 0, achievement: 0, perfectionism: 0, rights: 0, omnipotence: 0, autonomy: 0 };
+  const answers = {};
 
-  // Percorre cada pergunta, acumulando pontuações nos grupos
+  // Ensure the name field is filled
+  const name = form['name'].value.trim();
+  if (!name) {
+    alert("Por favor, insira o seu nome.");
+    return;
+  }
+  answers['Nome'] = name;
+
+  // Accumulate scores
   for (let i = 1; i <= totalQuestions; i++) {
     const answer = form[`q${i}`].value;
     if (answer) {
+      answers[`Q${i}`] = answer;
       const value = parseInt(answer, 10);
       if (i <= 5) scores.approval += value;
       else if (i <= 10) scores.love += value;
@@ -346,32 +362,44 @@ function calculateScore() {
     }
   }
 
-  // Exibir os resultados de pontuação no texto
+  // Display text results
   document.getElementById('result').innerHTML = `
-    <p>Pontuação de Aprovação: ${scores.approval}</p>
-    <p>Pontuação de Amor: ${scores.love}</p>
-    <p>Pontuação de Realização: ${scores.achievement}</p>
-    <p>Pontuação de Perfeccionismo: ${scores.perfectionism}</p>
-    <p>Pontuação de Direitos: ${scores.rights}</p>
-    <p>Pontuação de Onipotência: ${scores.omnipotence}</p>
-    <p>Pontuação de Autonomia: ${scores.autonomy}</p>
+    <p>Pontuação de Grupo I: ${scores.approval}</p>
+    <p>Pontuação de Grupo II: ${scores.love}</p>
+    <p>Pontuação de Grupo III: ${scores.achievement}</p>
+    <p>Pontuação de Grupo IV: ${scores.perfectionism}</p>
+    <p>Pontuação de Grupo V: ${scores.rights}</p>
+    <p>Pontuação de Grupo VI: ${scores.omnipotence}</p>
+    <p>Pontuação de Grupo VII: ${scores.autonomy}</p>
   `;
 
-  // Função para criar o gráfico de barras
+  // Add scores to answers object for submission
+  answers['Grupo I'] = scores.approval;
+  answers['Grupo II'] = scores.love;
+  answers['Grupo III'] = scores.achievement;
+  answers['Grupo IV'] = scores.perfectionism;
+  answers['Grupo V'] = scores.rights;
+  answers['Grupo VI'] = scores.omnipotence;
+  answers['Grupo VII'] = scores.autonomy;
+
+  // Submit answers and scores to Google Sheets
+  submitToGoogleSheet(answers);
+  
+  // Generate the bar chart
   generateChart(scores);
 
-    // Scroll automático para a div do gráfico
+  // Scroll to the chart
   document.getElementById('chart-container').scrollIntoView({ behavior: 'smooth' });
 }
 
 function generateChart(scores) {
-  // Exibir a div do gráfico
+  // Show the chart container
   document.getElementById('chart-container').style.display = 'block';
 
-  // Dados e configurações do gráfico
+  // Chart Data
   const ctx = document.getElementById('scoreChart').getContext('2d');
   const data = {
-    labels: ['Aprovação', 'Amor', 'Realização', 'Perfeccionismo', 'Direitos sobre Outros', 'Onipotência', 'Autonomia'],
+    labels: ['Grupo I', 'Grupo II', 'Grupo III', 'Grupo IV', 'Grupo V', 'Grupo VI', 'Grupo VII'],
     datasets: [{
       label: 'Pontuação por Grupo',
       data: [
@@ -411,8 +439,21 @@ function generateChart(scores) {
     }
   };
 
-  // Renderizar o gráfico
+  // Render the chart
   new Chart(ctx, config);
+}
+
+function submitToGoogleSheet(answers) {
+  const url = "https://script.google.com/macros/s/AKfycbw1wNEyNULHoFg8hrAbwfDj4_QnkK3q_TunCP5KD5KRKh3wIcHglqiIILQLdnx7sif8LA/exec";
+
+  fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(answers),
+  })
+  .then(response => response.json())
+  .then(data => console.log("Data saved successfully:", data))
+  .catch(error => console.error("Error saving data:", error));
 }
 </script>
 </body>
