@@ -462,10 +462,10 @@ function submitToGoogleSheet(answers) {
     mode: "no-cors"  // This bypasses the CORS policy
   })
   .then(() => {
-    feedbackDiv.innerHTML = "Data submitted successfully!";
+    feedbackDiv.innerHTML = "Dados Submetidos! Copie a  pontuação para um papel ou para um ficheiro e grave no seu computador.";
   })
   .catch(error => {
-    feedbackDiv.innerHTML = "An error occurred during submission.";
+    feedbackDiv.innerHTML = "Ocorreu um erro.";
     console.error("Error saving data:", error);
   });
 }
